@@ -45,3 +45,26 @@ expected_output=(
 agent=data_analyst_agent,
 )
 
+from crewai import Crew, Process
+from langchain_openai import ChatOpenAI
+
+# Define the crew with agents and tasks
+financial_trading_crew = Crew(
+    agents=[data_analyst_agent],
+    
+    tasks=[data_analysis_task],
+    
+    manager_llm=ChatOpenAI(model="gpt-4.1", 
+                           temperature=0.7),
+    process=Process.hierarchical,
+    verbose=True
+)
+
+financial_trading_inputs = {
+    'industry' : 'Artificial Intelligence'
+}
+
+result = financial_trading_crew.kickoff(inputs=financial_trading_inputs)
+
+from IPython.display import Markdown
+Markdown(result)
