@@ -66,5 +66,4 @@ financial_trading_inputs = {
 
 result = financial_trading_crew.kickoff(inputs=financial_trading_inputs)
 
-from IPython.display import Markdown
-Markdown(result)
+print(result.raw)
