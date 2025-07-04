@@ -16,3 +16,16 @@ Competition Agent: Researches competition in the market and evaluates differenti
 Feasibility Agent: Assesses the technical and operational feasibility of building and scaling the product given limited resources.
 
 Verdict Agent: Synthesizes insights from other agents and delivers a final recommendation: **Build**, **Pivot**, or **Don't Build**, with reasoning.
+
+
+inputs that we can expect form the user:
+
+  "startup_name": "VoxSynth",
+  "one_liner": "AI-powered tool to generate custom vocal tracks for music producers",
+  "problem": "It's hard and expensive for indie musicians to hire real vocalists",
+  "solution": "We use generative AI to create realistic vocals in various styles",
+  "target_users": "Indie music producers, content creators, hobbyists",
+  "tech_stack_or_claims": "We use diffusion-based voice generation models",
+  "revenue_model": "Subscription and pay-per-track model",
+  "competitive_edge": "Customization, voice library, fast turnaround",
+  "founder_background": "Ex-Google DeepMind + Berklee College of Music"
