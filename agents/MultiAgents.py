@@ -37,7 +37,7 @@ data_analysis_task = Task(
     "the selected startup industry ({{ industry }}). "
     "Use statistical modeling and machine learning to identify trends and competitors."
     )
-    ),
+    ,
 expected_output=(
         "Insights and alerts about significant market "
         f"opportunities or threats for making a startup in {industry} industry."
