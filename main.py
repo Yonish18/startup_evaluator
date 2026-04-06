@@ -1,8 +1,4 @@
-from typing import Any
-
-
-def prompt_startup_idea() -> str:
-    """Read a startup idea from the terminal and reject empty input."""
+def prompt_startup_idea():
     while True:
         idea = input("Enter a startup idea: ").strip()
         if idea:
@@ -10,9 +6,8 @@ def prompt_startup_idea() -> str:
         print("Startup idea cannot be empty.")
 
 
-def initialize_workflow_state(idea: str) -> dict[str, Any]:
-    """Create the shared state container for the staged evaluator workflow."""
-    return {
+def create_state(idea):
+    state = {
         "idea": idea,
         "initial_analyses": {
             "market": None,
@@ -27,9 +22,10 @@ def initialize_workflow_state(idea: str) -> dict[str, Any]:
         },
         "final_verdict": None,
     }
+    return state
 
 
-def main() -> None:
+def main():
     print("Multi-Agent Startup Evaluator")
     print("--------------------------------")
     print("Workflow:")
@@ -40,7 +36,7 @@ def main() -> None:
     print()
 
     idea = prompt_startup_idea()
-    state = initialize_workflow_state(idea)
+    state = create_state(idea)
 
     print()
     print("Workflow scaffold initialized.")
