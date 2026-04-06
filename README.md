@@ -19,32 +19,45 @@ A simple terminal-based CrewAI prototype that evaluates a startup idea using a s
 
 ## Output Format
 The specialist agents return short text with:
-- `Analysis`
-- `Assumptions`
-- `Risks`
+- `Core Judgment`
+- `Key Assumptions`
+- `Key Risks`
+- `Most Important Unknown`
 - `Confidence`
 
 The risk agent returns short text with:
 - `Main Weaknesses`
+- `Contradictions or Tensions`
 - `Questionable Assumptions`
-- `Missing Evidence or Gaps`
-- `Biggest Risks`
+- `Biggest Failure Risks`
 
-The verdict agent returns short text with:
+The verdict agent returns the final user-facing summary with:
 - `Overall Verdict`
-- `Why It Could Work`
-- `Main Concerns`
-- `Suggested Next Step`
+- `Final Analysis`
+- `Key Advantages`
+- `Finalized Risks`
+- `Biggest Constraint`
+- `Most Plausible Wedge`
+- `Best Next Test`
+
+## Project Structure
+- `main.py`: active terminal-based CrewAI startup evaluator
+- `requirements.txt`: Python dependencies
+- `.env.example`: safe template for local environment variables
+- `examples/TestStartup.txt`: sample startup idea for manual testing
+- `unused/legacy/`: old experiments, API/Docker files, and placeholders kept for reference
 
 ## Run
 1. Install dependencies:
    `pip install -r requirements.txt`
-2. Make sure `OPENAI_API_KEY` is set in your environment
-3. Run:
+2. Copy the example environment file:
+   `cp .env.example .env`
+3. Open `.env` and replace `your-openai-api-key-here` with your real OpenAI API key
+4. Run:
    `python main.py`
 
-To choose a model explicitly, set `OPENAI_MODEL_NAME` before running:
-`export OPENAI_MODEL_NAME="openai/gpt-4o-mini"`
+The `.env` file is ignored by git, so your real API key should stay local.
+To use a different model, change `OPENAI_MODEL_NAME` in `.env`.
 
 ## Notes
 - The workflow is designed as branch -> critique -> revision -> synthesis

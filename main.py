@@ -1,7 +1,10 @@
 import os
 
 from crewai import Agent, Crew, Task
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "openai/gpt-4o-mini")
 
