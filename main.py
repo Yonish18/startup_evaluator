@@ -82,9 +82,9 @@ def create_risk_agent():
 
 def create_verdict_agent():
     verdict_agent = Agent(
-        role="Verdict Analyst",
-        goal="Synthesize tradeoffs and make a clear final call under uncertainty.",
-        backstory="You avoid bland summaries and decide whether the idea is promising, needs validation, or looks weak.",
+        role="Final Startup Evaluator",
+        goal="Make a practical decision by weighing competing evidence from the revised analyses.",
+        backstory="You act like the final decision-maker: sharp, concise, and focused on what could realistically work next.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -291,19 +291,26 @@ def run_final_verdict(idea, revised_analyses, verdict_agent):
             f"{revised_analyses['competitor']}\n\n"
             "Revised Business Model Analysis:\n"
             f"{revised_analyses['business_model']}\n\n"
-            "Combine them into one final conclusion. "
-            "Do not just summarize the branches. "
+            "Make a final practical decision under uncertainty. "
+            "Do not just summarize the revised branch outputs. "
+            "Reconcile the tradeoffs across market demand, competition, and business model. "
             "Choose exactly one overall label: Promising, Needs Validation, or Weak. "
-            "Be decisive, but mention the uncertainty behind the call. "
-            "Do not mention market size or statistics unless they were provided in the input.\n\n"
+            "Identify the core reason the idea is attractive or unattractive. "
+            "Name the single biggest constraint. "
+            "If there is still a viable path, identify the narrowest promising wedge or use case. "
+            "If the idea is weak, explain exactly why it is weak. "
+            "Give one concrete experiment-oriented next test, not generic advice like 'do more research'. "
+            "Do not mention market size or statistics unless they were provided in the input. "
+            "Keep the output concise and sharp.\n\n"
             "Keep the response short and structured with these sections:\n"
             "Overall Verdict:\n"
-            "Why:\n"
-            "Main Concerns:\n"
-            "Highest-Priority Next Step:"
+            "Core Reason:\n"
+            "Biggest Constraint:\n"
+            "Most Plausible Wedge:\n"
+            "Best Next Test:"
         ),
         expected_output=(
-            "A short final verdict with Overall Verdict, Why, Main Concerns, and Highest-Priority Next Step sections."
+            "A concise final verdict with Overall Verdict, Core Reason, Biggest Constraint, Most Plausible Wedge, and Best Next Test sections."
         ),
         agent=verdict_agent,
     )
