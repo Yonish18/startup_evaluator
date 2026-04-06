@@ -36,8 +36,8 @@ def create_state(idea):
 def create_specialist_agents():
     market_agent = Agent(
         role="Market Analyst",
-        goal="Study customer demand, target users, and market need for a startup idea.",
-        backstory="You look at whether people actually want this and who the best customers would be.",
+        goal="Judge real user pain, why this should work now, and what would prove demand.",
+        backstory="You are skeptical about vague demand claims and care most about painful user problems.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -45,8 +45,8 @@ def create_specialist_agents():
 
     competitor_agent = Agent(
         role="Competitor Analyst",
-        goal="Study competitors, alternatives, and what makes a startup idea different.",
-        backstory="You compare the idea to existing products and point out where it may struggle or stand out.",
+        goal="Judge substitutes, switching behavior, and why users may not leave current solutions.",
+        backstory="You look for the practical reasons users stay with old tools, habits, or manual workarounds.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -54,8 +54,8 @@ def create_specialist_agents():
 
     business_model_agent = Agent(
         role="Business Model Analyst",
-        goal="Study how a startup idea could make money and whether the model looks realistic.",
-        backstory="You focus on pricing, customers, costs, and whether the business can grow in a practical way.",
+        goal="Judge who pays, why they pay, monetization risks, and what could break financially.",
+        backstory="You focus on whether the business can make money in a realistic way, not just sound interesting.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -71,8 +71,8 @@ def create_specialist_agents():
 def create_risk_agent():
     risk_agent = Agent(
         role="Risk Analyst",
-        goal="Critique multiple startup analyses and point out weak assumptions, gaps, and major risks.",
-        backstory="You review other analyses together and look for what they missed, overstated, or did not prove well.",
+        goal="Harshly critique assumptions, contradictions, weak reasoning, and likely failure points.",
+        backstory="You attack optimistic claims and look for the hidden reasons the startup might fail.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -83,8 +83,8 @@ def create_risk_agent():
 def create_verdict_agent():
     verdict_agent = Agent(
         role="Verdict Analyst",
-        goal="Combine revised startup analyses into one final clear conclusion.",
-        backstory="You read the final revised branch outputs together and turn them into one practical startup evaluation.",
+        goal="Synthesize tradeoffs and make a clear final call under uncertainty.",
+        backstory="You avoid bland summaries and decide whether the idea is promising, needs validation, or looks weak.",
         llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
@@ -99,14 +99,19 @@ def run_specialist_analysis(agent, idea, focus):
             f"Startup idea: {idea}\n\n"
             "You are working as one independent specialist branch. "
             "Do not assume you can see any other specialist output.\n\n"
+            "Do not give generic startup advice. "
+            "Do not repeat the startup idea unless it is needed for your reasoning. "
+            "Do not mention market size or statistics unless they were provided in the idea. "
+            "Be specific, skeptical, and concrete.\n\n"
             "Keep the response short and structured with these sections:\n"
-            "Analysis:\n"
-            "Assumptions:\n"
-            "Risks:\n"
+            "Core Judgment:\n"
+            "Key Assumptions:\n"
+            "Key Risks:\n"
+            "Most Important Unknown:\n"
             "Confidence:"
         ),
         expected_output=(
-            "A short structured analysis with Analysis, Assumptions, Risks, and Confidence sections."
+            "A short structured analysis with Core Judgment, Key Assumptions, Key Risks, Most Important Unknown, and Confidence sections."
         ),
         agent=agent,
     )
@@ -130,7 +135,7 @@ def run_initial_specialist_branches(idea, agents):
     market_output = run_specialist_analysis(
         agents["market"],
         idea,
-        "market demand, customers, and adoption",
+        "real user pain, why now, and what would prove demand",
     )
     state["market"] = market_output
     print("Market analysis complete.")
@@ -139,7 +144,7 @@ def run_initial_specialist_branches(idea, agents):
     competitor_output = run_specialist_analysis(
         agents["competitor"],
         idea,
-        "competition, substitutes, and differentiation",
+        "substitutes, switching behavior, and reasons users may not switch",
     )
     state["competitor"] = competitor_output
     print("Competitor analysis complete.")
@@ -148,7 +153,7 @@ def run_initial_specialist_branches(idea, agents):
     business_model_output = run_specialist_analysis(
         agents["business_model"],
         idea,
-        "business model, pricing, and scalability",
+        "who pays, why they pay, monetization risks, and financial weak points",
     )
     state["business_model"] = business_model_output
     print("Business model analysis complete.")
@@ -170,15 +175,17 @@ def run_risk_critique(idea, initial_analyses, risk_agent):
             "Business Model Analysis:\n"
             f"{initial_analyses['business_model']}\n\n"
             "Review all three together and write one shared critique.\n"
-            "Focus on weak assumptions, missing information, contradictions, blind spots, and major risks.\n\n"
+            "Do not simply repeat the previous outputs. "
+            "Identify contradictions across the branches, weak or hidden assumptions, and what would most likely cause failure. "
+            "Do not give generic startup advice or mention market size or statistics unless they were provided in the input.\n\n"
             "Keep the response short and structured with these sections:\n"
             "Main Weaknesses:\n"
+            "Contradictions or Tensions:\n"
             "Questionable Assumptions:\n"
-            "Missing Evidence or Gaps:\n"
-            "Biggest Risks:"
+            "Biggest Failure Risks:"
         ),
         expected_output=(
-            "One short shared critique with Main Weaknesses, Questionable Assumptions, Missing Evidence or Gaps, and Biggest Risks sections."
+            "One short shared critique with Main Weaknesses, Contradictions or Tensions, Questionable Assumptions, and Biggest Failure Risks sections."
         ),
         agent=risk_agent,
     )
@@ -203,14 +210,19 @@ def run_specialist_revision(agent, idea, focus, first_output, risk_critique):
             "This is the shared risk critique based on all specialist branches:\n"
             f"{risk_critique}\n\n"
             "Revise only your own analysis. Do not rewrite the other specialist branches.\n"
+            "Respond directly to the critique and say what changed from your first version. "
+            "Do not give generic startup advice. "
+            "Do not mention market size or statistics unless they were provided in the idea. "
+            "Be specific, skeptical, and concrete.\n\n"
             "Keep the response short and structured with these sections:\n"
-            "Analysis:\n"
-            "Assumptions:\n"
-            "Risks:\n"
+            "Updated Judgment:\n"
+            "What Changed:\n"
+            "Key Assumptions:\n"
+            "Key Risks:\n"
             "Confidence:"
         ),
         expected_output=(
-            "A revised short structured analysis with Analysis, Assumptions, Risks, and Confidence sections."
+            "A revised short structured analysis with Updated Judgment, What Changed, Key Assumptions, Key Risks, and Confidence sections."
         ),
         agent=agent,
     )
@@ -234,7 +246,7 @@ def run_revised_specialist_branches(idea, agents, initial_analyses, risk_critiqu
     market_revision = run_specialist_revision(
         agents["market"],
         idea,
-        "market demand, customers, and adoption",
+        "real user pain, why now, and what would prove demand",
         initial_analyses["market"],
         risk_critique,
     )
@@ -245,7 +257,7 @@ def run_revised_specialist_branches(idea, agents, initial_analyses, risk_critiqu
     competitor_revision = run_specialist_revision(
         agents["competitor"],
         idea,
-        "competition, substitutes, and differentiation",
+        "substitutes, switching behavior, and reasons users may not switch",
         initial_analyses["competitor"],
         risk_critique,
     )
@@ -256,7 +268,7 @@ def run_revised_specialist_branches(idea, agents, initial_analyses, risk_critiqu
     business_model_revision = run_specialist_revision(
         agents["business_model"],
         idea,
-        "business model, pricing, and scalability",
+        "who pays, why they pay, monetization risks, and financial weak points",
         initial_analyses["business_model"],
         risk_critique,
     )
@@ -279,15 +291,19 @@ def run_final_verdict(idea, revised_analyses, verdict_agent):
             f"{revised_analyses['competitor']}\n\n"
             "Revised Business Model Analysis:\n"
             f"{revised_analyses['business_model']}\n\n"
-            "Combine them into one final conclusion.\n\n"
+            "Combine them into one final conclusion. "
+            "Do not just summarize the branches. "
+            "Choose exactly one overall label: Promising, Needs Validation, or Weak. "
+            "Be decisive, but mention the uncertainty behind the call. "
+            "Do not mention market size or statistics unless they were provided in the input.\n\n"
             "Keep the response short and structured with these sections:\n"
             "Overall Verdict:\n"
-            "Why It Could Work:\n"
+            "Why:\n"
             "Main Concerns:\n"
-            "Suggested Next Step:"
+            "Highest-Priority Next Step:"
         ),
         expected_output=(
-            "A short final verdict with Overall Verdict, Why It Could Work, Main Concerns, and Suggested Next Step sections."
+            "A short final verdict with Overall Verdict, Why, Main Concerns, and Highest-Priority Next Step sections."
         ),
         agent=verdict_agent,
     )
