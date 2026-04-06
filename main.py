@@ -71,6 +71,17 @@ def create_risk_agent():
     return risk_agent
 
 
+def create_verdict_agent():
+    verdict_agent = Agent(
+        role="Verdict Analyst",
+        goal="Combine revised startup analyses into one final clear conclusion.",
+        backstory="You read the final revised branch outputs together and turn them into one practical startup evaluation.",
+        verbose=False,
+        allow_delegation=False,
+    )
+    return verdict_agent
+
+
 def run_specialist_analysis(agent, idea, focus):
     task = Task(
         description=(
@@ -246,6 +257,41 @@ def run_revised_specialist_branches(idea, agents, initial_analyses, risk_critiqu
     return revised
 
 
+def run_final_verdict(idea, revised_analyses, verdict_agent):
+    task = Task(
+        description=(
+            "You are the final synthesis stage in a startup evaluation workflow.\n\n"
+            f"Startup idea: {idea}\n\n"
+            "Below are the three revised specialist branch outputs.\n\n"
+            "Revised Market Analysis:\n"
+            f"{revised_analyses['market']}\n\n"
+            "Revised Competitor Analysis:\n"
+            f"{revised_analyses['competitor']}\n\n"
+            "Revised Business Model Analysis:\n"
+            f"{revised_analyses['business_model']}\n\n"
+            "Combine them into one final conclusion.\n\n"
+            "Keep the response short and structured with these sections:\n"
+            "Overall Verdict:\n"
+            "Why It Could Work:\n"
+            "Main Concerns:\n"
+            "Suggested Next Step:"
+        ),
+        expected_output=(
+            "A short final verdict with Overall Verdict, Why It Could Work, Main Concerns, and Suggested Next Step sections."
+        ),
+        agent=verdict_agent,
+    )
+
+    crew = Crew(
+        agents=[verdict_agent],
+        tasks=[task],
+        verbose=False,
+    )
+
+    result = crew.kickoff()
+    return str(result)
+
+
 def main():
     print("Multi-Agent Startup Evaluator")
     print("--------------------------------")
@@ -260,6 +306,7 @@ def main():
     state = create_state(idea)
     agents = create_specialist_agents()
     risk_agent = create_risk_agent()
+    verdict_agent = create_verdict_agent()
 
     print()
     print("Startup idea recorded.")
@@ -268,7 +315,6 @@ def main():
     state["initial_analyses"] = run_initial_specialist_branches(state["idea"], agents)
 
     print("Initial branch stage finished.")
-    print("Later stages are not added yet.")
     print()
     print("Market Output:")
     print(state["initial_analyses"]["market"])
@@ -289,7 +335,6 @@ def main():
     )
 
     print("Shared risk critique complete.")
-    print("Later stages are not added yet.")
     print()
     print("Risk Critique:")
     print(state["risk_critique"])
@@ -303,7 +348,6 @@ def main():
     )
 
     print("Revision stage finished.")
-    print("Final verdict stage is not added yet.")
     print()
     print("Revised Market Output:")
     print(state["revised_analyses"]["market"])
@@ -313,6 +357,20 @@ def main():
     print()
     print("Revised Business Model Output:")
     print(state["revised_analyses"]["business_model"])
+    print()
+
+    print("Running final verdict...")
+    print()
+    state["final_verdict"] = run_final_verdict(
+        state["idea"],
+        state["revised_analyses"],
+        verdict_agent,
+    )
+
+    print("Final verdict complete.")
+    print()
+    print("Final Verdict:")
+    print(state["final_verdict"])
 
 
 if __name__ == "__main__":
