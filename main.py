@@ -60,6 +60,17 @@ def create_specialist_agents():
     }
 
 
+def create_risk_agent():
+    risk_agent = Agent(
+        role="Risk Analyst",
+        goal="Critique multiple startup analyses and point out weak assumptions, gaps, and major risks.",
+        backstory="You review other analyses together and look for what they missed, overstated, or did not prove well.",
+        verbose=False,
+        allow_delegation=False,
+    )
+    return risk_agent
+
+
 def run_specialist_analysis(agent, idea, focus):
     task = Task(
         description=(
@@ -125,6 +136,42 @@ def run_initial_specialist_branches(idea, agents):
     return state
 
 
+def run_risk_critique(idea, initial_analyses, risk_agent):
+    task = Task(
+        description=(
+            "You are the shared risk critique stage in a startup evaluation workflow.\n\n"
+            f"Startup idea: {idea}\n\n"
+            "Below are the three initial specialist branch outputs.\n\n"
+            "Market Analysis:\n"
+            f"{initial_analyses['market']}\n\n"
+            "Competitor Analysis:\n"
+            f"{initial_analyses['competitor']}\n\n"
+            "Business Model Analysis:\n"
+            f"{initial_analyses['business_model']}\n\n"
+            "Review all three together and write one shared critique.\n"
+            "Focus on weak assumptions, missing information, contradictions, blind spots, and major risks.\n\n"
+            "Keep the response short and structured with these sections:\n"
+            "Main Weaknesses:\n"
+            "Questionable Assumptions:\n"
+            "Missing Evidence or Gaps:\n"
+            "Biggest Risks:"
+        ),
+        expected_output=(
+            "One short shared critique with Main Weaknesses, Questionable Assumptions, Missing Evidence or Gaps, and Biggest Risks sections."
+        ),
+        agent=risk_agent,
+    )
+
+    crew = Crew(
+        agents=[risk_agent],
+        tasks=[task],
+        verbose=False,
+    )
+
+    result = crew.kickoff()
+    return str(result)
+
+
 def main():
     print("Multi-Agent Startup Evaluator")
     print("--------------------------------")
@@ -138,6 +185,7 @@ def main():
     idea = prompt_startup_idea()
     state = create_state(idea)
     agents = create_specialist_agents()
+    risk_agent = create_risk_agent()
 
     print()
     print("Startup idea recorded.")
@@ -156,6 +204,21 @@ def main():
     print()
     print("Business Model Output:")
     print(state["initial_analyses"]["business_model"])
+    print()
+
+    print("Running shared risk critique...")
+    print()
+    state["risk_critique"] = run_risk_critique(
+        state["idea"],
+        state["initial_analyses"],
+        risk_agent,
+    )
+
+    print("Shared risk critique complete.")
+    print("Later stages are not added yet.")
+    print()
+    print("Risk Critique:")
+    print(state["risk_critique"])
 
 
 if __name__ == "__main__":
