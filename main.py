@@ -1,4 +1,9 @@
+import os
+
 from crewai import Agent, Crew, Task
+
+
+MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "openai/gpt-4o-mini")
 
 
 def prompt_startup_idea():
@@ -33,6 +38,7 @@ def create_specialist_agents():
         role="Market Analyst",
         goal="Study customer demand, target users, and market need for a startup idea.",
         backstory="You look at whether people actually want this and who the best customers would be.",
+        llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
     )
@@ -41,6 +47,7 @@ def create_specialist_agents():
         role="Competitor Analyst",
         goal="Study competitors, alternatives, and what makes a startup idea different.",
         backstory="You compare the idea to existing products and point out where it may struggle or stand out.",
+        llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
     )
@@ -49,6 +56,7 @@ def create_specialist_agents():
         role="Business Model Analyst",
         goal="Study how a startup idea could make money and whether the model looks realistic.",
         backstory="You focus on pricing, customers, costs, and whether the business can grow in a practical way.",
+        llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
     )
@@ -65,6 +73,7 @@ def create_risk_agent():
         role="Risk Analyst",
         goal="Critique multiple startup analyses and point out weak assumptions, gaps, and major risks.",
         backstory="You review other analyses together and look for what they missed, overstated, or did not prove well.",
+        llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
     )
@@ -76,6 +85,7 @@ def create_verdict_agent():
         role="Verdict Analyst",
         goal="Combine revised startup analyses into one final clear conclusion.",
         backstory="You read the final revised branch outputs together and turn them into one practical startup evaluation.",
+        llm=MODEL_NAME,
         verbose=False,
         allow_delegation=False,
     )
@@ -300,6 +310,8 @@ def main():
     print("2. Shared risk critique")
     print("3. Revised specialist branches")
     print("4. Final verdict")
+    print()
+    print(f"Using model: {MODEL_NAME}")
     print()
 
     idea = prompt_startup_idea()

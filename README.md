@@ -43,6 +43,9 @@ The verdict agent returns short text with:
 3. Run:
    `python main.py`
 
+To choose a model explicitly, set `OPENAI_MODEL_NAME` before running:
+`export OPENAI_MODEL_NAME="openai/gpt-4o-mini"`
+
 ## Notes
 - The workflow is designed as branch -> critique -> revision -> synthesis
 - The Python code runs these stages sequentially for simplicity
