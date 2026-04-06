@@ -172,6 +172,80 @@ def run_risk_critique(idea, initial_analyses, risk_agent):
     return str(result)
 
 
+def run_specialist_revision(agent, idea, focus, first_output, risk_critique):
+    task = Task(
+        description=(
+            f"Revise your earlier startup analysis from a {focus} perspective.\n\n"
+            f"Startup idea: {idea}\n\n"
+            "This was your earlier analysis:\n"
+            f"{first_output}\n\n"
+            "This is the shared risk critique based on all specialist branches:\n"
+            f"{risk_critique}\n\n"
+            "Revise only your own analysis. Do not rewrite the other specialist branches.\n"
+            "Keep the response short and structured with these sections:\n"
+            "Analysis:\n"
+            "Assumptions:\n"
+            "Risks:\n"
+            "Confidence:"
+        ),
+        expected_output=(
+            "A revised short structured analysis with Analysis, Assumptions, Risks, and Confidence sections."
+        ),
+        agent=agent,
+    )
+
+    crew = Crew(
+        agents=[agent],
+        tasks=[task],
+        verbose=False,
+    )
+
+    result = crew.kickoff()
+    return str(result)
+
+
+def run_revised_specialist_branches(idea, agents, initial_analyses, risk_critique):
+    print("Running revised specialist branches...")
+    print()
+
+    revised = {}
+
+    market_revision = run_specialist_revision(
+        agents["market"],
+        idea,
+        "market demand, customers, and adoption",
+        initial_analyses["market"],
+        risk_critique,
+    )
+    revised["market"] = market_revision
+    print("Market revision complete.")
+    print()
+
+    competitor_revision = run_specialist_revision(
+        agents["competitor"],
+        idea,
+        "competition, substitutes, and differentiation",
+        initial_analyses["competitor"],
+        risk_critique,
+    )
+    revised["competitor"] = competitor_revision
+    print("Competitor revision complete.")
+    print()
+
+    business_model_revision = run_specialist_revision(
+        agents["business_model"],
+        idea,
+        "business model, pricing, and scalability",
+        initial_analyses["business_model"],
+        risk_critique,
+    )
+    revised["business_model"] = business_model_revision
+    print("Business model revision complete.")
+    print()
+
+    return revised
+
+
 def main():
     print("Multi-Agent Startup Evaluator")
     print("--------------------------------")
@@ -219,6 +293,26 @@ def main():
     print()
     print("Risk Critique:")
     print(state["risk_critique"])
+    print()
+
+    state["revised_analyses"] = run_revised_specialist_branches(
+        state["idea"],
+        agents,
+        state["initial_analyses"],
+        state["risk_critique"],
+    )
+
+    print("Revision stage finished.")
+    print("Final verdict stage is not added yet.")
+    print()
+    print("Revised Market Output:")
+    print(state["revised_analyses"]["market"])
+    print()
+    print("Revised Competitor Output:")
+    print(state["revised_analyses"]["competitor"])
+    print()
+    print("Revised Business Model Output:")
+    print(state["revised_analyses"]["business_model"])
 
 
 if __name__ == "__main__":
